@@ -1,0 +1,74 @@
+#include <iostream>
+#include <vector>
+#include "gtest/gtest.h"
+
+
+class Plural{
+    int plural;
+public:
+    Plural(){
+        plural=0;
+    }
+    bool belonging(char element){
+        int bit=1;
+        bit = bit<<(97-(int)element);
+        if((plural & bit) != 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    void addElement(char element){
+        int bit=1;
+        bit = bit<<(97-(int)element);
+        plural= plural | bit;
+    }
+
+    void deleteElement(char element){
+        int bit=1;//set first bit to 1
+        bit = ~(bit << 97 - (int) element);
+        plural= plural && bit;
+    }
+
+    friend Plural& operator+(Plural& right,Plural& left){
+        auto tmp = new Plural;
+        tmp->plural= right.plural | left.plural;
+        return *tmp;
+    }
+
+    friend Plural& operator-(Plural& right,Plural& left){
+        auto tmp = new Plural;
+        tmp->plural= right.plural & left.plural;
+        return *tmp;
+    }
+
+    friend Plural& operator/(Plural& right,Plural& left){
+        auto tmp = new Plural;
+        int bits=~left.plural;
+        tmp->plural= right.plural & bits;
+        return *tmp;
+    }
+
+
+};
+
+
+TEST(test, TestName) {
+    Plural a,b;
+    a.addElement('a');
+    b.addElement('b');
+    Plural c=a+b;
+    EXPECT_TRUE(a.belonging('a'));
+    EXPECT_TRUE(c.belonging('a')&c.belonging('b'));
+    c.deleteElement('b');
+    EXPECT_FALSE(c.belonging('b'));
+    a.addElement('b');
+    Plural v=a-b;
+    EXPECT_TRUE(v.belonging('b'));
+    EXPECT_FALSE(v.belonging('a'));
+
+
+}
+
+
