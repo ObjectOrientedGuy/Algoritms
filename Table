@@ -1,0 +1,49 @@
+#include <iostream>
+#include <vector>
+#include <gtest/gtest.h>
+
+
+using namespace std;
+
+template <typename type_key,typename type_body>
+struct Row{
+    type_key key;
+    type_body body;
+    Row(){};
+    Row(type_key key, type_body body) : key(key), body(body) {}
+};
+template <typename type_key,typename type_body>
+class Table{
+private:
+    vector<Row<type_key,type_body>> table;
+public:
+    void add(type_key key,type_body body){
+        table.push_back(Row(key,body));
+    }
+    bool find(type_key key){
+        for(int i=0;i<table.size();i++){
+            if(table.at(i).key==key){
+                return true;
+            }
+        }
+        return false;
+    }
+
+};
+
+TEST(te,name){
+    Table<int,int> table;
+    table.add(4,7);
+    table.add(450,7);
+    table.add(78,89);
+
+
+    EXPECT_EQ(table.find(4),true);
+    EXPECT_EQ(table.find(450),true);
+    EXPECT_EQ(table.find(78),true);
+
+
+
+}
+
+
