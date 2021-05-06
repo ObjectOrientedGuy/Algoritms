@@ -1,0 +1,36 @@
+#include <iostream>
+#include <vector>
+#include "gtest/gtest.h"
+
+struct Rule{
+    std::string left;
+    std::string right;
+
+    Rule(const std::string &left, const std::string &right) : left(left), right(right) {}
+};
+
+
+void algoritmMarkova(std::string& word,std::vector<Rule> rules) {
+        for (int k = 0; k < rules.size(); k++) {
+            auto it = word.find(rules.at(k).left);
+            if(it!=-1){
+                int r = rules.at(k).left.size();
+                word.erase(it, r);
+                word.insert(it, rules.at(k).right);
+                k=-1;
+            }
+        }
+}
+
+TEST(test1,test){
+    std::string buff="bacaabaa";
+    std::vector<Rule> rules;
+    rules.emplace_back(Rule("ab","b"));
+    rules.emplace_back(Rule("ac","c"));
+    rules.emplace_back(Rule("aa","a"));
+    algoritmMarkova(buff,rules);
+
+    EXPECT_EQ(buff,"bcba");
+
+}
+
