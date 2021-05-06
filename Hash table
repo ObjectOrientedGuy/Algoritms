@@ -1,0 +1,54 @@
+#include <iostream>
+#include <list>
+#include <vector>
+#include <gtest/gtest.h>
+
+using namespace std;
+
+class HashTable{
+private:
+    list<int> *table;
+    int total_elements;
+public:
+     int getHash(int key){
+        return key % total_elements;
+     }
+
+    HashTable(int n){
+        total_elements = n;
+        table = new list<int>[total_elements];
+    }
+
+    void insertElement(int key){
+        table[getHash(key)].push_back(key);
+    }
+
+    void printAll(){
+        for(int i = 0; i < total_elements; i++){
+            cout<< i ;
+            for(int j : table[i])
+                cout << j << " => ";
+            cout << endl;
+        }
+    }
+
+    vector<int> ElementWithHash(int i){
+        vector<int > vect;
+            for(int j : table[i])
+                vect.push_back(j);
+        return vect;
+    }
+};
+
+TEST(Test,test){
+    HashTable ht(3);
+    vector<int> test_work={4,10};
+    ht.insertElement(4);
+    ht.insertElement(10);
+
+
+    for(int x=0;x<ht.ElementWithHash(1).size();++x){
+        EXPECT_EQ(test_work.at(x),ht.ElementWithHash(1).at(x));
+    }
+}
+
