@@ -1,0 +1,56 @@
+#include <iostream>
+#include <list>
+#include <gtest/gtest.h>
+
+template <typename T>
+struct node{
+    int priority;
+    T data;
+
+    node(int priority, T data) : priority(priority), data(data) {}
+};
+template <typename T>
+class Queue{
+std::list<node<T>> queue;
+public:
+    void addElement(T data,int priority){
+
+        for(auto it=queue.begin();it!=queue.end();++it){
+            if (it->priority > priority)
+            {
+                queue.insert(it, node<T>(priority,data));
+                break;
+            }
+        }
+        queue.push_back(node<T>(priority,data));
+    }
+
+    T getElement()
+    {
+        T result = queue.front().data;
+        queue.erase(queue.begin());
+        return result;
+    }
+    size_t size()
+    {
+        return queue.size();
+    }
+
+    bool isEmpty()
+    {
+        return queue.size() == 0;
+    }
+};
+
+TEST(test,test){
+    Queue<int> queue;
+    queue.addElement(5,2);
+    queue.addElement(3,5);
+    queue.addElement(8,1);
+    queue.addElement(9,2);
+    EXPECT_EQ(queue.getElement(),8);
+}
+
+
+
+
