@@ -1,0 +1,221 @@
+#include "gtest/gtest.h"
+
+
+struct node {
+     node *left;
+    int data;
+    int height;
+     node *right;
+
+};
+
+class AVL
+{
+public:
+     node * root;
+    AVL(){
+        this->root = nullptr;
+
+    }
+
+    bool belonging(int key){
+        node* tmp = root;
+        while (tmp != nullptr){
+            if(tmp -> data == key){
+                return true;
+            }
+            if(tmp->data>key){
+                tmp=tmp->left;
+            }else if(tmp->data<key){
+                tmp=tmp->right;
+            }
+
+
+        }
+        return false;
+    }
+
+    int height(node *p){
+
+            if(p->left && p->right){
+            if (p->left->height < p->right->height)
+                return p->right->height + 1;
+            else return  p->left->height + 1;
+            }
+            else if(p->left != nullptr && p->right ==nullptr){
+               return p->left->height + 1;
+            }
+            else if(p->left ==nullptr && p->right != nullptr){
+               return p->right->height + 1;
+            }
+            return 0;
+
+    }
+
+    int balanceFactor(node *n){
+            if(n->left && n->right){
+                return n->left->height - n->right->height;
+            }
+            else if(n->left != nullptr && n->right == nullptr){
+                return n->left->height;
+            }
+            else if(n->left== nullptr && n->right != nullptr){
+                return -n->right->height;
+            }
+    }
+
+    node * llrotation( node *n){
+
+        auto p = n;
+        auto tp = p->left;
+
+        p->left = tp->right;
+        tp->right = p;
+
+        return tp;
+    }
+
+
+    node * rrrotation(node *n){
+        auto p = n;
+        auto tp = p->right;
+
+        p->right = tp->left;
+        tp->left = p;
+
+        return tp;
+    }
+
+
+    node * rlrotation( node *n){
+
+        auto p = n;
+        auto tp = p->right;
+        auto tp2 =p->right->left;
+
+        p -> right = tp2->left;
+        tp ->left = tp2->right;
+        tp2 ->left = p;
+        tp2->right = tp;
+
+        return tp2;
+    }
+
+    node * lrrotation( node *n){
+        auto p = n;
+        auto tp = p->left;
+        auto tp2 =p->left->right;
+
+        p -> left = tp2->right;
+        tp ->right = tp2->left;
+        tp2 ->right = p;
+        tp2->left = tp;
+
+        return tp2;
+    }
+
+    node* insert(node *r,int data){
+
+        if(r== nullptr){
+            auto n = new node;
+            n->data = data;
+            r = n;
+            r->left = r->right = nullptr;
+            r->height = 1;
+            return r;
+        }
+        else{
+            if(data < r->data)
+            r->left = insert(r->left,data);
+            else
+            r->right = insert(r->right,data);
+        }
+
+        r->height = height(r);
+
+        if(balanceFactor(r) == 2 && balanceFactor(r->left) == 1){
+            r = llrotation(r);
+        }
+        else if(balanceFactor(r) == -2 && balanceFactor(r->right) == -1){
+            r = rrrotation(r);
+        }
+        else if(balanceFactor(r) == -2 && balanceFactor(r->right) == 1){
+            r = rlrotation(r);
+        }
+        else if(balanceFactor(r) == 2 && balanceFactor(r->left) == -1){
+            r = lrrotation(r);
+        }
+
+        return r;
+
+        }
+
+     node * deleteNode( node *p ,int data){
+
+        if(p->left == nullptr && p->right == nullptr){
+                if(p==root)
+                    root = nullptr;
+            delete p;
+            return nullptr;
+        }
+
+         node *q;
+        if(p->data < data){
+            p->right = deleteNode(p->right,data);
+        }
+        else if(p->data > data){
+            p->left = deleteNode(p->left,data);
+        }
+        else{
+            if(p->left != nullptr){
+                q=p->left;
+                while(q->right!=nullptr){
+                    q = q->right;
+                }
+                p->data = q->data;
+                p->left=deleteNode(p->left,q->data);
+            }
+            else{
+                p=p->right;
+                while(p->left!=nullptr){
+                    p = p->left;
+                }
+                q=p;
+                p->data = q->data;
+                p->right = deleteNode(p->right,q->data);
+            }
+        }
+
+        if(balanceFactor(p) == 2 && balanceFactor(p->left) == 1){ p = llrotation(p); }
+        else if(balanceFactor(p) == 2 && balanceFactor(p->left) == -1){ p = lrrotation(p); }
+        else if(balanceFactor(p) == 2 && balanceFactor(p->left) == 0){ p = llrotation(p); }
+        else if(balanceFactor(p) == -2 && balanceFactor(p->right) == -1){ p = rrrotation(p); }
+        else if(balanceFactor(p) == -2 && balanceFactor(p->right) == 1){ p = rlrotation(p); }
+        else if(balanceFactor(p) == -2 && balanceFactor(p->right) == 0){ p = llrotation(p); }
+
+
+        return p;
+    }
+};
+
+
+
+
+TEST(test1,test){
+    AVL tree;
+    tree.root=tree.insert(tree.root,8);
+    tree.root=tree.insert(tree.root,5);
+    tree.root=tree.insert(tree.root,6);
+    tree.root=tree.insert(tree.root,1);
+    tree.root=tree.insert(tree.root,3);
+
+    EXPECT_TRUE(tree.belonging(3));
+    EXPECT_TRUE(tree.belonging(8));
+    EXPECT_TRUE(tree.belonging(5));
+    EXPECT_TRUE(tree.belonging(6));
+    EXPECT_TRUE(tree.belonging(7));
+
+    tree.root = tree.deleteNode(tree.root,3);
+
+    EXPECT_FALSE(tree.belonging(3));
+}
