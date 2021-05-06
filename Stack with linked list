@@ -1,0 +1,52 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+template <typename type_key,typename type_body>
+struct Row{
+    type_key key;
+    type_body body;
+    Row(type_key key, type_body body) : key(key), body(body) {}
+};
+template <typename type_key,typename type_body>
+class Table{
+private:
+    vector<Row<type_key,type_body>> table;
+public:
+    void add(type_key key,type_body body){
+        table.push_back(Row(key,body));
+    }
+    bool find(type_key key){
+        bool find=false;
+        for(int i=0;i<table.size();i++){
+            if(table.at(i).key==key){
+                return true;
+            }
+        }
+    }
+    int find_return_num(type_key key){
+        for(int i=0;i<table.size();i++){
+            if(table.at(i).key==key){
+                return i;
+            }
+        }
+    }
+    void delete_element(type_key key){
+        table.erase(find_return_num(key));
+        int k;
+    }
+
+};
+
+
+int main(){
+
+    Table<int,int> table;
+    table.add(4,7);
+    table.add(11,8);
+    table.delete_element(11);
+    cout<<table.find(4);
+
+    return 0 ;
+};
